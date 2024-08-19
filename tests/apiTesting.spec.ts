@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { ConduitPage } from '../page-objects/pageObject.ts';
 
-test('Navigate to URL [mocking API response entirely]', async ({page}) =>{
+test('Navigate to URL [modifying API response]', async ({page}) =>{
+
+  let cp = new ConduitPage(page)
   
   await page.route('**/*api/articles*', async route => {
     const response = await route.fetch();
@@ -13,12 +16,13 @@ test('Navigate to URL [mocking API response entirely]', async ({page}) =>{
   })
 
   await page.goto('https://conduit.bondaracademy.com/');
+
   await page.waitForTimeout(2000) // small timeout for Playwright to wait until the modified request is processed
-  await expect(page.locator('app-article-list app-article-preview').first().locator('h1')).toContainText('Test Title');
-  await expect(page.locator('app-article-list app-article-preview').first().locator('p')).toContainText('Test Description');
+  await expect(cp.titleOfFirstArticle).toContainText('Test Title');
+  await expect(cp.descriptionOfFirstArticle).toContainText('Test Description');
 })
 
-test('Check if text is displayed [modifying response from API]', async ({ page }) => {
+test('Check if text is displayed [mocking API response]', async ({ page }) => {
   await page.route('**/*tags', async route =>{
       const tags = {
         "tags": [
