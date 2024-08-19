@@ -36,7 +36,7 @@ test('Check if text is displayed [modifying response from API]', async ({ page }
   await expect(page.locator('div', {hasText: "Popular Tags"})).toContainText(["asdf","GitHasdfub", "Bondaasdfr"])
 });
 
-test('Making requests', async ({ page, request }) => {
+test('Making requests', async ({ request }) => {
   const response = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
     data: {"user":{"email":"testEmail@testmail.net","password":"Welcome1"}}
   })
@@ -52,5 +52,13 @@ test('Making requests', async ({ page, request }) => {
     }
   })
   expect(articleResponse.status()).toBe(201)
+
+  const articleResponseBody = await articleResponse.json()
+  const deleteArticleResponse = await request.delete(`https://conduit-api.bondaracademy.com/api/articles/${articleResponseBody.article.slug}`,{
+    headers: {
+      "Authorization": `Token ${accessToken}`
+    }
+  })
+  expect(deleteArticleResponse.status()).toBe(204)
 
 })
